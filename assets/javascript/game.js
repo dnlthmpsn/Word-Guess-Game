@@ -1,12 +1,12 @@
 // VARIABLES;
 // =======================================================
-//Create array or words
 const wordList = ["leonard", "lowry", "carter", "bosh", "derozan"];
 var wins = 0;
 var wrongGuesses = [];
 var wordSoFar = [];
-var randomWord = wordList[Math.floor(Math.random() * wordList.length)];
+randomWord = wordList[Math.floor(Math.random() * wordList.length)];
 var guessesRemaining; 
+var restart= false;
 
 //DOM MANIPULATION
 var currentWord = document.querySelector("#currentWord");
@@ -16,7 +16,6 @@ var guessCounter = document.querySelector("#guessCounter");
 
 // FUNCTIONS;
 // =======================================================
-
 
 function generateWordSoFar(){
     for(var i = 0; i < randomWord.length; i++){
@@ -30,21 +29,19 @@ function playerWin(){
     if(wordSoFar.join('') == randomWord){
        wins = wins + 1;
        winCounter.innerHTML =("Wins: " + wins);
+       restart = true;
        console.log(wordSoFar.join(''));   
        console.log(wins);
-       alert("win");
 
        
        }
    }
-
+ 
 
 function init(){
     guessesRemaining = randomWord.length * 2;
     currentWord.innerHTML = generateWordSoFar().join(' ');
 }
-
-
 
 
 
@@ -54,7 +51,6 @@ init();
 // MAIN;
 // =======================================================
 document.addEventListener('keypress', (event) => {
-    var restart= false;
     var key = String.fromCharCode(event.keyCode);
    
     guessesRemaining = guessesRemaining - 1;
@@ -66,7 +62,7 @@ document.addEventListener('keypress', (event) => {
         wordSoFar[randomWord.indexOf(key)] = key;
         currentWord.innerHTML = wordSoFar.join(' ');
         playerWin();
-        if(wordSoFar == randomWord){
+        if(wordSoFar === randomWord){
             restart=true;
         }
 
@@ -83,13 +79,16 @@ document.addEventListener('keypress', (event) => {
         }
  
   if(restart === true){
-    randomWord; 
-    guessesRemaining = randomWord.length * 2;
-  guessCounter.innerHTML = ("Remaining guesses: " + guessesRemaining);
-  wrongBank.innerHTML = "Wrong guesses: ";
-
+    wordSoFar = [];
+    currentWord.innerHTML = generateWordSoFar().join(' ');
+    guessCounter.innerHTML = ("Remaining guesses: ");
+    wrongBank.innerHTML = ("Wrong guesses: "); 
+    console.log(randomWord);
   }
+  
 });
+
+
 
 
 
