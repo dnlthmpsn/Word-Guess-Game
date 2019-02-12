@@ -8,10 +8,7 @@ WordGuess = {
         randomWord: function(){
             var randomWord =(wordList[Math.floor(Math.random() * wordList.length)])
             return randomWord;
-    },
-
-
-        
+    },        
         wins: 0,
         wrongGuesses: [],
         wordSoFar: [],

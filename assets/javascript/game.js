@@ -1,108 +1,122 @@
-// VARIABLES;
+//GLOBAL VARIABLES;
 // =======================================================
-const wordList = ["leonard", "lowry", "carter", "bosh", "derozan"];
-var wins = 0;
-var wrongGuesses = [];
-var wordSoFar = [];
-randomWord = wordList[Math.floor(Math.random() * wordList.length)];
-var guessesRemaining; 
-var restart= false;
+// arrays and variables for holding data
+var wordList = ["leonard", "lowry", "carter", "bosh", "derozan"];
+var currentWord = "";
+var lettersinWord = [];
+var numBlanks = 0;
+var wordsoFar = [];
+var wrongLetters = [];
 
-//DOM MANIPULATION
-var currentWord = document.querySelector("#currentWord");
-var wrongBank = document.querySelector("#wrongBank");
-var winCounter = document.querySelector("#winCounter");
-var guessCounter = document.querySelector("#guessCounter");
+//Game counters
+var winCount = 0;
+var lossCount = 0;
+var guessesLeft = 10;
 
-// FUNCTIONS;
+// FUNCTIONS
 // =======================================================
 
-function generateWordSoFar(){
-    for(var i = 0; i < randomWord.length; i++){
-        wordSoFar.push('_');
-    }
-    return wordSoFar;
-}
-
-function playerWin(){
-
-    if(wordSoFar.join('') == randomWord){
-       wins = wins + 1;
-       winCounter.innerHTML =("Wins: " + wins);
-       restart = true;
-       console.log(wordSoFar.join(''));   
-       console.log(wins);
-
-       
-       }
-   }
- 
-
-function init(){
-    guessesRemaining = randomWord.length * 2;
-    currentWord.innerHTML = generateWordSoFar().join(' ');
-}
+function startGame() {
+     currentWord = wordList[Math.floor(Math.random() * wordList.length)];
+     lettersinWord = currentWord.split("");
+     numBlanks = lettersinWord.length;
 
 
-
-init();
-
-
-// MAIN;
-// =======================================================
-document.addEventListener('keypress', (event) => {
-    var key = String.fromCharCode(event.keyCode);
+// reset
    
-    guessesRemaining = guessesRemaining - 1;
-    guessCounter.innerHTML =("Remaining Guesses: "  + guessesRemaining);
-    //if users guess is right
-    if(randomWord.indexOf(key) > -1) {
+    guessesLeft = 10;
+    wrongLetters = [];
+    wordsoFar = [];
+
+//Populate blanks and successes with right number of blanks
+    for (var i = 0; i <numBlanks; i++){
+        wordsoFar.push("_");
+    }
+
+//updating html
+document.querySelector("#currentWord").innerHTML = wordsoFar.join(" ");
+document.querySelector("#guessCounter").innerHTML = ("Guesses Remaining: " + guessesLeft);
+document.querySelector("#winCounter").innerHTML = ("Games Won: " + winCount);
+document.querySelector("#lossCounter").innerHTML = ("Games Lost: " + lossCount);
+document.querySelector("#wrongBank").innerHTML = ("Wrong Guesses: " + wrongLetters);
+
+//testing and debugging
+console.log(currentWord);
+console.log(lettersinWord);
+console.log(numBlanks);
+console.log(wordsoFar);
+
+}
+
+function checkLetters(letter) {
+    //check if the letter exists anywhere in the word
+    var letterPresence = false;
+    for (var i = 0; i <numBlanks; i++){
+        if(currentWord[i] == letter) {
+            letterPresence = true;
+        }
+    }
+    // check where in the word the letter exists, then populate out the wordsoFar array.
+    if(letterPresence) {
+        for(var i=0; i<numBlanks; i++){
+            if(currentWord[i] == letter){
+                wordsoFar[i] = letter;
+            }
+        }
+    }
+    else {
+        wrongLetters.push(letter);
+        guessesLeft--
+    }
+    //testing and debugging
+console.log(wordsoFar); 
+}
+
+function roundComplete(){
+    console.log("win count: " + winCount + "| Loss Count: " + lossCount + "|Guesses Left: " + guessesLeft);
+
+    //update html to reflect the most recent count stats
+    document.querySelector("#guessCounter").innerHTML =("Guesses Remaining: " +guessesLeft);
+    document.querySelector("#currentWord").innerHTML = wordsoFar.join(" ");
+    document.querySelector("#wrongBank").innerHTML = ("Wrong Guessses: " + wrongLetters.join(" "));
+
+    //check if user won
+    if(lettersinWord.toString() == wordsoFar.toString()){
+        winCount++;
+        alert("Winner!");
+
+        // update the win counter in the html
+        document.querySelector("#winCounter").innerHTML = winCount;
         
-    //replace currentWord with right letter
-        wordSoFar[randomWord.indexOf(key)] = key;
-        currentWord.innerHTML = wordSoFar.join(' ');
-        playerWin();
-        if(wordSoFar === randomWord){
-            restart=true;
-        }
+        startGame();
 
-    } else {
-        wrongGuesses.push(key);
-        console.log(wrongGuesses); 
-        wrongBank.innerHTML =("Wrong Guesses: " + wrongGuesses.join(", "));
-          
+    } 
+    //check if user lost
+    else if (guessesLeft ==0){
+        lossCount++;
+        alert("You Lose");
+
+        //update HTML
+        document.querySelector("#lossCounter").innerHTML = lossCount;
+
+        startGame();
+
     }
-    if(wordSoFar.join('') != randomWord 
-        && guessesRemaining == 0){
-        alert("game over");
-        restart=true;
-        }
- 
-  if(restart === true){
-    wordSoFar = [];
-    currentWord.innerHTML = generateWordSoFar().join(' ');
-    guessCounter.innerHTML = ("Remaining guesses: ");
-    wrongBank.innerHTML = ("Wrong guesses: "); 
-    console.log(randomWord);
-  }
-  
-});
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-   
     
+    // check if user lost
+}
+
+
+
+//MAIN PROCESS
+//====================================================
+//initiates game
+startGame();
+
+document.onkeyup = function(event){
+    var letterGuessed = String.fromCharCode(event.keyCode).toLowerCase();
+    checkLetters(letterGuessed);
+    roundComplete();
+    //testing / debugging
+    console.log(letterGuessed);
+}
